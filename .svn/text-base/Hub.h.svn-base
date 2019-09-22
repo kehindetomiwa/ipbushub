@@ -1,0 +1,80 @@
+//! Dear emacs this is -*-c++-*-
+
+/*******************************
+ * Hub
+ * IPBus 2.0 control hub
+ *
+ * Carlos.Solans@cern.ch
+ ******************************/
+
+#ifndef Hub_h
+#define Hub_h 1
+
+#include "ipbus/PacketBuilder.h"
+#include "ipbus/Packet.h"
+#include "ipbushub/Transfer.h"
+#include <cstdlib>
+#include <string>
+#include <vector>
+#include <netdb.h>
+#include <list>
+#include <mutex>
+
+namespace ipbus{
+  
+  class Hub{
+	
+  public:
+	
+	static bool enabled;	
+
+  private:
+
+    struct sockaddr_in serveraddr;
+    int32_t sock;
+    PacketBuilder pb;
+    static bool verbose;
+	std::mutex lock;
+	std::list<Transfer> transfers;
+	
+  public:
+
+    /**
+     * Hub constructor
+     */
+    Hub(std::string servername, int port=50001);
+    
+    /**
+     * Hub destructor
+     */
+    ~Hub();    
+
+	/**
+	 * Run the hub
+	 */
+	void Run();
+
+	/**
+	 * Stop the hub
+	 */
+	void Stop();
+	
+	/**
+	 * Start the transmission
+	 **/
+	void StartTx();
+
+	/**
+	 * Start the reception
+	 **/
+	void StartRx();
+
+	/**
+	 * Start garbage collection
+	 **/
+	void StartGc();
+
+  };
+}
+
+#endif

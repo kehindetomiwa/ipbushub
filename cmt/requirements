@@ -1,0 +1,31 @@
+package ipbushub
+
+author Carlos.Solans@cern.ch
+
+use Policy
+use ipbus
+
+private
+macro_append cppflags " -std=c++11 "
+
+#library ipbushub "Hub.cpp Transfer.cpp"
+#macro plibs " libipbushub.$(shlibsuffix) "
+
+#application ipbus-hub "main.cpp"
+#macro_append ipbus-hublinkopts " -L$(bin) -lipbushub "
+#macro papps " ipbus-hub "
+#macro_append ipbus-hub_dependencies "ipbushub"
+
+application test-1 "test1.cpp"
+macro_append papps " test-1 "
+#macro_append test-1_dependencies "ipbushub"
+
+application ipbus-hub "ipbus-hub.cpp"
+macro_append ipbus-hublinkopts " -pthread  "
+macro_append papps " ipbus-hub "
+#macro_append ipbus-hub2_dependencies "ipbushub"
+
+
+#macro ipbushub_linkopts " -lipbushub "
+#apply_pattern install_libs files="$(plibs)"
+apply_pattern install_apps files="$(papps)"

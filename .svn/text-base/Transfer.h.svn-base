@@ -1,0 +1,36 @@
+//! Dear emacs this is -*-c++-*-
+
+/*******************************
+ * Transfer
+ * IPBus 2.0 entry in the hub
+ *
+ * Carlos.Solans@cern.ch
+ ******************************/
+
+#ifndef Transfer_h
+#define Transfer_h 1
+
+#include <stdint.h>
+#include <netinet/in.h>
+#include "ipbus/Packet.h"
+
+namespace ipbus{
+  
+  class Transfer{
+	
+  public:
+
+	struct sockaddr_in client_addr;
+	Packet * packet_in;
+	Packet * packet_out;
+	uint32_t server_pkid;
+	uint32_t client_pkid;
+	uint32_t status;
+
+	Transfer();
+	~Transfer();
+
+  };
+}
+
+#endif

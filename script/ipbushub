@@ -1,0 +1,91 @@
+#!/bin/sh
+#
+# ipbushub service to start the ipbus-hub
+#
+# chkconfig: 5 95 5
+#
+# hide: true
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+MYSETUP=/afs/cern.ch/user/t/tiledemo/public/Prometeo/Prometeo-1.0.1/setup.sh
+COMMAND="ipbus-hub -p 50001 50002 50003 50004 192.168.0.1"
+PIDFILE="/var/run/ipbus-hub.pid"
+
+# See how we were called.
+case "$1" in
+    
+    start)
+    if [ -f $PIDFILE ]; then
+	PID=`cat ${PIDFILE}`
+	if [ -n "`ps axf | grep ${PID} | grep -v grep`" ]; then
+	    printf "%-30s\n" "ipbushub running with pid ${PID}"
+	else
+	    $0 dostart
+	fi
+    else
+	$0 dostart
+    fi
+    ;;
+    
+    stop)       
+    if [ -f $PIDFILE ]; then
+	PID=`cat ${PIDFILE}`
+	if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
+	    printf "%-30s\n" "ipbushub not running "
+	else
+	    $0 dostop
+	fi
+    else
+	printf "%-30s\n" "ipbushub not running "
+    fi
+    ;;
+    
+    dostart)
+    printf "%-30s" "Starting ipbushub..."
+    source $MYSETUP
+    PID=`$COMMAND > /dev/null 2>&1 & echo $!`
+    if [ -z $PID ]; then
+	printf "%30s\n" "failed"
+    else
+	echo $PID > $PIDFILE
+	printf "%30s\n" "with pid ${PID}"
+    fi
+    ;;
+
+    dostop)
+    printf "%-30s" "Shutting down ipbushub "
+    PID=`cat $PIDFILE` 
+    kill -9 $PID
+    rm $PIDFILE
+    printf "%30s\n" "done"
+    ;;
+    
+    status)       
+    printf "%-30s" "Checking ipbus-hub..."
+    if [ -f $PIDFILE ]; then
+	PID=`cat $PIDFILE`
+        if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
+	    printf "%20s\n" "process dead but pidfile exists"
+	else
+            printf "%20s\n" "running with pid ${PID}"
+        fi
+    else
+        printf "%20s\n" "not running"
+    fi
+    ;;
+    
+    restart|reload)
+    $0 stop
+    $0 start
+    ;;
+
+    *)
+    echo "*** ipbushub {start|stop|status|restart}"
+    exit 1
+
+esac
+
+exit 0
+
